@@ -1,0 +1,89 @@
+services:
+    php-fpm:
+        build:
+            context: .
+            dockerfile: docker/php-fpm/Dockerfile
+        volumes:
+            - .:/var/www/project
+        depends_on:
+            - database
+        networks:
+            - app-network
+
+    nginx:
+        build:
+            context: .
+            dockerfile: ./docker/nginx/Dockerfile
+        ports:
+            - "80:80"
+        volumes:
+            - .:/var/www/project
+        depends_on:
+            - php-fpm
+        networks:
+            - app-network
+
+    database:
+        build:
+            context: .
+            dockerfile: ./docker/mongodb/Dockerfile
+        environment:
+            MONGO_INITDB_ROOT_USERNAME: ${MONGODB_USER}
+            MONGO_INITDB_ROOT_PASSWORD: ${MONGODB_PASSWORD}
+        ports:
+            - "27017:27017"
+        volumes:
+            - mongo_data:/data/db
+        networks:
+            - app-network
+
+    rabbitmq:
+        build:
+            context: .
+            dockerfile: docker/rabbitmq/Dockerfile
+        environment:
+            - RABBITMQ_DEFAULT_USER=${RABBITMQ_DEFAULT_USER}
+            - RABBITMQ_DEFAULT_PASS=${RABBITMQ_DEFAULT_PASS}
+        ports:
+            - "5672:5672"
+            - "15672:15672"
+        volumes:
+            - rabbitmq_data:/var/lib/rabbitmq
+        networks:
+            - app-network
+
+    command-worker:
+        build:
+            context: .
+            dockerfile: docker/php-fpm/Dockerfile
+        volumes:
+            - .:/var/www/project
+        command: php bin/console messenger:consume async -vv
+        depends_on:
+           - rabbitmq
+           - database
+        networks:
+           - app-network
+        restart: always
+
+    event-worker:
+        build:
+            context: .
+            dockerfile: docker/php-fpm/Dockerfile
+        volumes:
+            - .:/var/www/project
+        command: php bin/console messenger:consume async_external_api -vv
+        depends_on:
+            - rabbitmq
+            - database
+        networks:
+            - app-network
+        restart: always
+
+networks:
+    app-network:
+        driver: bridge
+
+volumes:
+    mongo_data:
+    rabbitmq_data:

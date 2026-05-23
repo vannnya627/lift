@@ -1,0 +1,7 @@
+parameters:
+    level: 10
+    paths:
+        - src
+    ignoreErrors:
+        - message: '#Property .*::\$id is never written, only read.#'
+          path: src/Domain/Document/

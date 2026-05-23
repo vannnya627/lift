@@ -1,0 +1,45 @@
+framework:
+    messenger:
+        failure_transport: failed
+
+        transports:
+            async:
+                dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
+                options:
+                    exchange:
+                        name: command
+                        type: direct
+                    queues:
+                        async: ~
+
+            async_external_api:
+                dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
+                options:
+                    exchange:
+                        name: event
+                        type: direct
+                    queues:
+                        async_external_api: ~
+
+            failed:
+                dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
+                options:
+                    exchange:
+                        name: failed
+                        type: direct
+                    queues:
+                        failed: ~
+
+            #sync: 'sync://'
+
+        routing:
+            App\Application\Command\AddUserCommand: async
+            App\Application\Event\UserCreatedEvent: async_external_api
+
+# when@test:
+#    framework:
+#        messenger:
+#            transports:
+#                # replace with your transport name here (e.g., my_transport: 'in-memory://')
+#                # For more Messenger testing tools, see https://github.com/zenstruck/messenger-test
+#                async: 'in-memory://'
