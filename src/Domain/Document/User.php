@@ -2,9 +2,10 @@
 
 namespace App\Domain\Document;
 
-use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
+use Doctrine\ODM\MongoDB\Mapping\Attribute as ODM;
 
 #[ODM\Document(collection: 'Users')]
+#[ODM\Index(keys: ['phoneNumbers' => 'asc', 'lastName' => 'asc', 'firstName' => 'asc'])]
 class User
 {
     #[ODM\Id]
@@ -18,7 +19,6 @@ class User
      * @var list<string>
      */
     #[ODM\Field(type: 'collection')]
-    #[ODM\UniqueIndex]
     private array $phoneNumbers = [];
     #[ODM\Field(type: 'string', nullable: true)]
     private ?string $ip = null;

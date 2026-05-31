@@ -5,10 +5,8 @@ namespace App\Infrastructure\Repository;
 use App\Domain\Document\User;
 use App\Domain\Repository\UserRepositoryInterface;
 use Doctrine\ODM\MongoDB\DocumentManager;
-use Doctrine\ODM\MongoDB\Iterator\Iterator;
 use Doctrine\ODM\MongoDB\LockException;
 use Doctrine\ODM\MongoDB\Mapping\MappingException;
-use Doctrine\ODM\MongoDB\MongoDBException;
 use Doctrine\ODM\MongoDB\Repository\DocumentRepository;
 
 /**
@@ -35,13 +33,7 @@ class UserRepository extends DocumentRepository implements UserRepositoryInterfa
      */
     public function findUserByPhoneNumbers(array $phones): ?User
     {
-        /** @var User|null $user */
-        $user = $this->createQueryBuilder()
-            ->field('phoneNumbers')->in($phones)
-            ->getQuery()
-            ->getSingleResult();
-
-        return $user;
+        return $this->findOneBy(['phoneNumbers' => $phones]);
     }
 
     /**
@@ -54,19 +46,10 @@ class UserRepository extends DocumentRepository implements UserRepositoryInterfa
     }
 
     /**
-     * @throws MongoDBException
+     * @return list<User>
      */
     public function findAndSortUsers(string $sortField, string $sortOrder): array
     {
-        /** @var Iterator<User> $cursor */
-        $cursor = $this->createQueryBuilder()
-            ->sort($sortField, $sortOrder)
-            ->getQuery()
-            ->execute();
-
-        /** @var list<User> $users */
-        $users = array_values($cursor->toArray());
-
-        return $users;
+        return array_values($this->findBy(criteria: [], orderBy: [$sortField => $sortOrder]));
     }
 }
