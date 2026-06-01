@@ -25,6 +25,19 @@ class User
     #[ODM\Field(type: 'string', nullable: true)]
     private ?string $country = null;
 
+    #[ODM\Field(type: 'date_immutable')]
+    private \DateTimeImmutable $createdAt;
+
+    public function __construct()
+    {
+        $this->createdAt = new \DateTimeImmutable();
+    }
+
+    public function getCreatedAt(): \DateTimeImmutable
+    {
+        return $this->createdAt;
+    }
+
     public function getId(): string
     {
         return $this->id;
