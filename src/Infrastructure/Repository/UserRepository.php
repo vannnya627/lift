@@ -52,4 +52,14 @@ class UserRepository extends DocumentRepository implements UserRepositoryInterfa
     {
         return array_values($this->findBy(criteria: [], orderBy: [$sortField => $sortOrder]));
     }
+
+    /**
+     * @param list<string> $ids
+     *
+     * @return list<User>
+     */
+    public function findUsersByIds(array $ids): array
+    {
+        return array_values($this->findBy(['id' => ['$in' => $ids]]));
+    }
 }

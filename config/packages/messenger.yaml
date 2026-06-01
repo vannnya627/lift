@@ -21,6 +21,15 @@ framework:
                     queues:
                         async_external_api: ~
 
+            async_analytics:
+                dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
+                options:
+                    exchange:
+                        name: analytics_event
+                        type: direct
+                    queues:
+                        async_analytics: ~
+
             failed:
                 dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
                 options:
@@ -35,6 +44,7 @@ framework:
         routing:
             App\Application\Command\AddUserCommand: async
             App\Application\Event\UserCreatedEvent: async_external_api
+            App\Application\Event\UserEnrichedEvent: async_analytics
 
 # when@test:
 #    framework:

@@ -21,4 +21,11 @@ interface UserRepositoryInterface
      * @return list<User>
      */
     public function findAndSortUsers(string $sortField, string $sortOrder): array;
+
+    /**
+     * @param list<string> $ids
+     *
+     * @return list<User>
+     */
+    public function findUsersByIds(array $ids): array;
 }

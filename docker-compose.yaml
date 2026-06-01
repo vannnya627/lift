@@ -37,6 +37,22 @@ services:
         networks:
             - app-network
 
+    clickhouse:
+        build:
+            context: .
+            dockerfile: ./docker/clickhouse/Dockerfile
+        environment:
+            - CLICKHOUSE_DB=${CLICKHOUSE_DB}
+            - CLICKHOUSE_USER=${CLICKHOUSE_USER}
+            - CLICKHOUSE_PASSWORD=${CLICKHOUSE_PASSWORD}
+        ports:
+            - "8123:8123"
+            - "9000:9000"
+        volumes:
+            - clickhouse_data:/var/lib/clickhouse
+        networks:
+            - app-network
+
     rabbitmq:
         build:
             context: .
@@ -80,6 +96,20 @@ services:
             - app-network
         restart: always
 
+    analytics-worker:
+        build:
+            context: .
+            dockerfile: docker/php-fpm/Dockerfile
+        volumes:
+            - .:/var/www/project
+        command: php bin/console messenger:consume async_analytics -vv
+        depends_on:
+            - rabbitmq
+            - clickhouse
+        networks:
+            - app-network
+        restart: always
+
 networks:
     app-network:
         driver: bridge
@@ -87,3 +117,4 @@ networks:
 volumes:
     mongo_data:
     rabbitmq_data:
+    clickhouse_data:
