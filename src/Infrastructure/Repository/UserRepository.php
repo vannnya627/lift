@@ -33,7 +33,7 @@ class UserRepository extends DocumentRepository implements UserRepositoryInterfa
      */
     public function findUserByPhoneNumbers(array $phones): ?User
     {
-        return $this->findOneBy(['phoneNumbers' => $phones]);
+        return $this->findOneBy(['phoneNumbers' => ['$in' => $phones]]);
     }
 
     /**
